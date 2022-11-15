@@ -1,0 +1,1 @@
+connection.executescript(f.read())
