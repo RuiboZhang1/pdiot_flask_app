@@ -109,23 +109,23 @@ def predict():
     ]
 
     res_class_labels = {
-        1: 'Lying down left',
-        2: 'Lying down on back',
-        3: 'Lying down on stomach',
-        4: 'Lying down right',
-        5: 'Sitting bent backward',
-        6: 'Sitting bent forward',
-        7: 'Sitting'
+        1: 'lying_down_left',
+        2: 'lying_down_on_back',
+        3: 'lying_down_on_stomach',
+        4: 'lying_down_right',
+        5: 'sitting_bent_backward',
+        6: 'sitting_bent_forward',
+        7: 'sitting'
     }
 
     thi_class_labels = {
-        0: 'Desk work',
-        1: 'Climbing stairs',
-        2: 'Descending stairs',
-        3: 'Running',
-        4: 'Walking at normal speed',
-        5: 'Movement',
-        6: 'Standing'
+        0: 'desk_work',
+        1: 'ascending_stairs',
+        2: 'descending_stairs',
+        3: 'running',
+        4: 'walking',
+        5: 'general_movement',
+        6: 'standing'
     }
 
     resFeatures = []

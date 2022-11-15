@@ -9,4 +9,3 @@ r = requests.post('http://34.89.117.73:5000/predict', json=json_data)
 
 
 print(r.text)
-print("finish")
