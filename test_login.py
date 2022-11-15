@@ -1,6 +1,6 @@
 import requests
 
-url = 'https://pdiot-367920.ew.r.appspot.com/login'
+url = 'http://34.89.117.73:5000/login'
 
 registerObject = {'student_id': 's1911028', 'password': '12312312312'}
 

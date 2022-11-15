@@ -8,6 +8,15 @@ import onnxruntime as rt
 
 app = Flask(__name__)
 
+# preload model
+res = rt.InferenceSession("ONNX/res.onnx")
+thi = rt.InferenceSession("ONNX/thi.onnx")
+input_name_res = res.get_inputs()[0].name
+label_name_res = res.get_outputs()[0].name
+input_name_thi = thi.get_inputs()[0].name
+label_name_thi = thi.get_outputs()[0].name
+
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -50,10 +59,11 @@ def login():
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
+    print("receive request")
 
     helper_functions.writeCsv(data.get('res'), data.get('thi'))
 
-    return helper_functions.predict()
+    return predict()
 
 
 # HOW TO USE TIMESTAMP TO FIND THE HISTORY
@@ -86,10 +96,87 @@ def history():
             # selection activity from database where match the student_id and between the start time and current time
             
 
+def predict():
+    result = None
+    resDf = pd.read_csv("cache/res.csv")
+    thiDf = pd.read_csv("cache/thi.csv")
+    res_columns_of_interest = [
+        'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z'
+    ]
+    thi_columns_of_interest = [
+        'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z', 'mag_x',
+        'mag_y', 'mag_z'
+    ]
+
+    res_class_labels = {
+        1: 'Lying down left',
+        2: 'Lying down on back',
+        3: 'Lying down on stomach',
+        4: 'Lying down right',
+        5: 'Sitting bent backward',
+        6: 'Sitting bent forward',
+        7: 'Sitting'
+    }
+
+    thi_class_labels = {
+        0: 'Desk work',
+        1: 'Climbing stairs',
+        2: 'Descending stairs',
+        3: 'Running',
+        4: 'Walking at normal speed',
+        5: 'Movement',
+        6: 'Standing'
+    }
+
+    resFeatures = []
+    thiFeatures = []
+    # print(resDf["accel_x"].to_list())
+    for feature in res_columns_of_interest:
+        data = np.array(resDf[feature].to_list())
+        resFeatures.append(np.sum(data))
+        resFeatures.append(np.median(data))
+        resFeatures.append(np.mean(data))
+        resFeatures.append(50)
+        resFeatures.append(np.std(data))
+        resFeatures.append(np.var(data))
+        resFeatures.append(np.sqrt(np.mean(data**2)))
+        resFeatures.append(max(data))
+        resFeatures.append(max(map(abs, data)))
+        resFeatures.append(min(data))
+
+    for feature in thi_columns_of_interest:
+        data = np.array(thiDf[feature].to_list())
+        thiFeatures.append(np.sum(data))
+        thiFeatures.append(np.median(data))
+        thiFeatures.append(np.mean(data))
+        thiFeatures.append(50)
+        thiFeatures.append(np.std(data))
+        thiFeatures.append(np.var(data))
+        thiFeatures.append(np.sqrt(np.mean(data**2)))
+        thiFeatures.append(max(data))
+        thiFeatures.append(max(map(abs, data)))
+        thiFeatures.append(min(data))
+
+    
+    resFeatures = np.array([resFeatures])
+    resFeatures = resFeatures.astype(np.float32)
+    pred_onx = res.run([label_name_res], {input_name_res: resFeatures})[0]
+
+    if pred_onx[0] == 100:
+        
+        thiFeatures = np.array([thiFeatures])
+        thiFeatures = thiFeatures.astype(np.float32)
+        pred_onx = thi.run([label_name_thi], {input_name_thi: thiFeatures})[0]
+        result = thi_class_labels[pred_onx[0]]
+    else:
+        result = res_class_labels[pred_onx[0]]
+    # print(result)
+    return result
 
         
 
 
 
 if __name__ == '__main__':
+    # app.run(host="10.154.0.2", debug=True)
     app.run(debug=True)
