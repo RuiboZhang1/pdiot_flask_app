@@ -38,10 +38,11 @@ def verifyUser(student_id, password):
         return False
 
 
-def checkExistHistory(student_id, activity, start_time, end_time):
+def checkExistHistory(student_id, activity, start_time):
     con = sql.connect("database.db")
     cur = con.cursor()
-    statement = f"SELECT 1 FROM history WHERE student_id = '{student_id} AND activity = '{activity}' AND start_time = '{start_time}' AND end_time = '{end_time}'"
+    statement = f"SELECT 1 FROM history WHERE student_id = '{student_id}' AND activity = '{activity}' AND start_time = '{start_time}'"
+    print(statement)
     cur.execute(statement)
 
     if cur.fetchone() is not None:
@@ -59,8 +60,13 @@ def insertHistory(student_id, activity, start_time):
 def getHistory(student_id, start_time, curr_time):
     con = sql.connect("database.db")
     cur = con.cursor()
-    statement = f"SELECT * FROM history WHERE student_id = '{student_id} AND start_time >= '{start_time} sq'"
+    statement = f"SELECT * FROM history WHERE student_id = '{student_id}' AND start_time BETWEEN '{start_time}' AND '{curr_time}'"
+    cur.execute(statement)
 
+    activity_list = []
+    for i in cur.fetchall():
+        activity_list.append(i[1])
+    return activity_list
 
 def writeCsv(res, thi):
     res = json.loads(res)
@@ -79,4 +85,9 @@ def writeCsv(res, thi):
     
     file.close()
 
+def generateActivityDic():
+    activity_dic = {"lying_down_left":0, "lying_down_on_back":0, "lying_down_on_stomach":0, "lying_down_right":0, "sitting_bent_backward":0, 
+                    "sitting_bent_forward":0, "sitting":0, "desk_work":0, "ascending_stairs":0, "descending_stairs":0, "running":0,
+                    "walking":0, "general_movement":0, "standing":0}
 
+    return activity_dic

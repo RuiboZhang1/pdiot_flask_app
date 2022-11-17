@@ -7,7 +7,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE history (
-    student_id TEXT NOT NULL PRIMARY KEY,
+    student_id TEXT NOT NULL,
     activity TEXT NOT NULL,
     start_time TEXT NOT NULL
 );
