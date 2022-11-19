@@ -76,69 +76,55 @@ def predict():
 # HOW TO USE TIMESTAMP TO FIND THE HISTORY
 # 1. Activity Per Hour, 1 miniute slice
 # 2. Activity Per Day, 10 miniutes slice
-@app.route('/history', methods=['GET', 'POST'])
+@app.route('/history', methods=['GET'])
 def history():
-    if request.method == 'POST':
-        student_id = request.json.get('student_id')
-        activity = request.json.get('activity')
-        start_time = request.json.get('start_time')
-
-
-        if (helper_functions.checkExistHistory(student_id, activity, start_time)):
-            print("History is existed")
-            abort(400)
-        else:
-            helper_functions.insertHistory(student_id, activity, start_time)
-            print('history added')
-            message = {'success':'true'}
-            return make_response(jsonify(message), 200)
-    else:
-        student_id = request.json.get('student_id')
-        curr_time = request.json.get('curr_time') # timestamp in milliseconds 
-        get_type = request.json.get('get_type') # hour or miniute
-        if (get_type == 'hour'):
-            return_list = []
-            time_list = []
-            for i in range(61):
-                time_list.insert(0, str(int(curr_time) - 60000 * i))
+    student_id = request.json.get('student_id')
+    curr_time = "16688" + request.json.get('curr_time')[:-2] # timestamp in milliseconds
+    print("current time:", curr_time)
+    get_type = request.json.get('get_type') # hour or miniute
+    if (get_type == 'hour'):
+        return_list = []
+        time_list = []
+        for i in range(61):
+            time_list.insert(0, str(int(curr_time) - 60000 * i))
+        
+        for i in range(60):
+            start_time = time_list[i]
+            end_time = time_list[i+1]
+            activity_list = helper_functions.getHistory(student_id, start_time, end_time)
             
-            for i in range(60):
-                start_time = time_list[i]
-                end_time = time_list[i+1]
-                activity_list = helper_functions.getHistory(student_id, start_time, end_time)
+            if (activity_list == []):
+                return_list.append('')
+            else:
+                activity_dic = helper_functions.generateActivityDic()
+                for j in activity_list:
+                    activity_dic[j] += 1
                 
-                if (activity_list == []):
-                    return_list.append('')
-                else:
-                    activity_dic = helper_functions.generateActivityDic()
-                    for j in activity_list:
-                        activity_dic[j] += 1
-                    
-                    most_common_activity = max(activity_dic, key=activity_dic.get)
-                    return_list.append(most_common_activity)
-        elif (get_type == 'miniute'):  # 5 miniutes
-            return_list = []
-            time_list = []
-            for i in range(61):
-                time_list.insert(0, str(int(curr_time) - 5000 * i))
+                most_common_activity = max(activity_dic, key=activity_dic.get)
+                return_list.append(most_common_activity)
+    elif (get_type == 'miniute'):  # 5 miniutes
+        return_list = []
+        time_list = []
+        for i in range(61):
+            time_list.insert(0, str(int(curr_time) - 5000 * i))
 
-            for i in range(60):
-                start_time = time_list[i]
-                end_time = time_list[i+1]
-                activity_list = helper_functions.getHistory(student_id, start_time, end_time)
+        for i in range(60):
+            start_time = time_list[i]
+            end_time = time_list[i+1]
+            activity_list = helper_functions.getHistory(student_id, start_time, end_time)
+            
+            if (activity_list == []):
+                return_list.append('')
+            else:
+                activity_dic = helper_functions.generateActivityDic()
+                for j in activity_list:
+                    activity_dic[j] += 1
                 
-                if (activity_list == []):
-                    return_list.append('')
-                else:
-                    activity_dic = helper_functions.generateActivityDic()
-                    for j in activity_list:
-                        activity_dic[j] += 1
-                    
-                    most_common_activity = max(activity_dic, key=activity_dic.get)
-                    return_list.append(most_common_activity)
+                most_common_activity = max(activity_dic, key=activity_dic.get)
+                return_list.append(most_common_activity)
 
-        print(return_list)
-        return make_response(jsonify(return_list), 200)
+    print(return_list)
+    return make_response(jsonify(return_list), 200)
             
 
 
