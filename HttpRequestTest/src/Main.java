@@ -19,7 +19,7 @@ public class Main {
         StringBuffer responseContent = new StringBuffer();
 
         // URL url = new URL("http://127.0.0.1:5000/register");
-        URL url = new URL("http://127.0.0.1:5000/login");
+        URL url = new URL("http://34.89.117.73:5000/register");
         connection = (HttpURLConnection) url.openConnection();
 
         connection.setRequestMethod("POST");

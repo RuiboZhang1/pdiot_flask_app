@@ -62,7 +62,8 @@ def predict():
     print("receive request")
 
     student_id = data.get('id')
-    timestamp = data.get('res')[0]
+    timestamp = data.get('res')[0][0][:-2]
+    print(timestamp)
 
     helper_functions.writeCsv(data.get('res'), data.get('thi'))
     activity = predict()
@@ -93,13 +94,13 @@ def history():
             return make_response(jsonify(message), 200)
     else:
         student_id = request.json.get('student_id')
-        curr_time = request.json.get('curr_time') # timestamp in centisecond
+        curr_time = request.json.get('curr_time') # timestamp in milliseconds 
         get_type = request.json.get('get_type') # hour or miniute
         if (get_type == 'hour'):
             return_list = []
             time_list = []
             for i in range(61):
-                time_list.insert(0, str(int(curr_time) - 6000 * i))
+                time_list.insert(0, str(int(curr_time) - 60000 * i))
             
             for i in range(60):
                 start_time = time_list[i]
@@ -119,7 +120,7 @@ def history():
             return_list = []
             time_list = []
             for i in range(61):
-                time_list.insert(0, str(int(curr_time) - 500 * i))
+                time_list.insert(0, str(int(curr_time) - 5000 * i))
 
             for i in range(60):
                 start_time = time_list[i]
