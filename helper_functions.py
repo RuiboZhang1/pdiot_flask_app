@@ -69,8 +69,6 @@ def getHistory(student_id, start_time, curr_time):
     return activity_list
 
 def writeCsv(res, thi):
-    res = json.loads(res)
-    thi = json.loads(thi)
     file = open("cache/thi.csv", "w")
     file.write(
         "timestamp,accel_x,accel_y,accel_z,gyro_x,gyro_y,gyro_z,mag_x,mag_y,mag_z\n"

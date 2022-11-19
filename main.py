@@ -1,10 +1,10 @@
 import sqlite3
-import json
 from flask import Flask, request, Response, abort, make_response, jsonify
 import helper_functions
 import pandas as pd
 import numpy as np
 import onnxruntime as rt
+import time
 
 app = Flask(__name__)
 
@@ -79,7 +79,7 @@ def predict():
 @app.route('/history', methods=['GET'])
 def history():
     student_id = request.json.get('student_id')
-    curr_time = "16688" + request.json.get('curr_time')[:-2] # timestamp in milliseconds
+    curr_time = str(int(time.time() * 1000))
     print("current time:", curr_time)
     get_type = request.json.get('get_type') # hour or miniute
     if (get_type == 'hour'):
@@ -210,5 +210,5 @@ def predict():
 
 
 if __name__ == '__main__':
-    # app.run(host="10.154.0.2", debug=True)
-    app.run(debug=True)
+    app.run(host="10.154.0.2", debug=True)
+    #app.run(debug=True)
