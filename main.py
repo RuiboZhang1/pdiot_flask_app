@@ -111,16 +111,27 @@ def history():
     # total recorded activity
     total = len(return_list) - return_list.count("")
     unique_activity = list(filter(None, return_list))
-    activity_percentage_dic = helper_functions.generateActivityDic()
-    print(return_list)
+    activity_percentage_dic = helper_functions.generateActivityPercentageDic()
+
     for i in unique_activity:
-        print(return_list.count(i))
-        activity_percentage_dic[i] = return_list.count(unique_activity) / total
-        
+        if i == "general_movement":
+            activity_percentage_dic["Movement"] += return_list.count(i) / total
+        elif i == "ascending_stairs" or i == "descending_stairs":
+            activity_percentage_dic["Up/Down stairs"] += return_list.count(i) / total
+        elif i == "sitting" or i == "sitting_bent_forward" or i == "sitting_bent_backward" or i == "desk_work":
+            activity_percentage_dic["Sitting"] += return_list.count(i) / total
+        elif i == "standing":
+            activity_percentage_dic["Standing"] += return_list.count(i) / total
+        elif i == "Running":
+            activity_percentage_dic["Running"] += return_list.count(i) / total
+        elif i == "Walking":
+            activity_percentage_dic["Walking"] += return_list.count(i) / total
+        elif i == "lying_down_left" or i == "lying_down_on_back" or i == "lying_down_on_stomach" or i == "lying_down_right":
+            activity_percentage_dic["Lying"] += return_list.count(i) / total        
 
     return_json = {"data": return_list, "percentage": activity_percentage_dic}
 
-    #print(return_json)
+    print(return_json)
     return make_response(jsonify(return_json), 200)
             
 
