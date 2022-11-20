@@ -58,11 +58,11 @@ def login():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json
     print("receive request")
-
+    data = request.json
     student_id = data.get('id')
-    timestamp = "16688" + str(data.get('res')[0][0])[:-2]
+    print(student_id)
+    timestamp = "166" + str(data.get('res')[0][0])[:-2]
 
     helper_functions.writeCsv(data.get('res'), data.get('thi'))
     activity = predict()
@@ -134,6 +134,7 @@ def predict():
     result = None
     resDf = pd.read_csv("cache/res.csv")
     thiDf = pd.read_csv("cache/thi.csv")
+    # print(thiDf)
     res_columns_of_interest = [
         'accel_x', 'accel_y', 'accel_z', 'gyro_x', 'gyro_y', 'gyro_z'
     ]
