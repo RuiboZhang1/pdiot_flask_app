@@ -89,3 +89,9 @@ def generateActivityDic():
                     "walking":0, "general_movement":0, "standing":0}
 
     return activity_dic
+
+def generateActivityPercentageDic():
+    activity_dic = {"Movement":0, "Up/Down stairs":0, "Sitting":0, "Standing":0, "Running":0, 
+                    "Walking":0, "Lying":0}
+
+    return activity_dic
