@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import onnxruntime as rt
 import time
+from collections import Counter
 
 app = Flask(__name__)
 
@@ -92,32 +93,34 @@ def history():
         for i in range(61):
             time_list.insert(0, str(int(curr_time) - 5000 * i))
 
-        for i in range(60):
-            start_time = time_list[i]
-            end_time = time_list[i+1]
-            activity_list = helper_functions.getHistory(student_id, start_time, end_time)
+    for i in range(60):
+        start_time = time_list[i]
+        end_time = time_list[i+1]
+        activity_list = helper_functions.getHistory(student_id, start_time, end_time)
             
-            if (activity_list == []):
-                return_list.append('')
-            else:
-                activity_dic = helper_functions.generateActivityDic()
-                for j in activity_list:
-                    activity_dic[j] += 1
+        if (activity_list == []):
+            return_list.append('')
+        else:
+            activity_dic = helper_functions.generateActivityDic()
+            for j in activity_list:
+                activity_dic[j] += 1
                 
-                most_common_activity = max(activity_dic, key=activity_dic.get)
-                return_list.append(most_common_activity)
+            most_common_activity = max(activity_dic, key=activity_dic.get)
+            return_list.append(most_common_activity)
 
     # total recorded activity
     total = len(return_list) - return_list.count("")
     unique_activity = list(filter(None, return_list))
     activity_percentage_dic = helper_functions.generateActivityDic()
+    print(return_list)
     for i in unique_activity:
+        print(return_list.count(i))
         activity_percentage_dic[i] = return_list.count(unique_activity) / total
         
 
     return_json = {"data": return_list, "percentage": activity_percentage_dic}
 
-    print(return_json)
+    #print(return_json)
     return make_response(jsonify(return_json), 200)
             
 
