@@ -9,7 +9,7 @@ from collections import Counter
 
 app = Flask(__name__)
 
-# preload model
+# preload model for saving time
 res = rt.InferenceSession("ONNX/res.onnx")
 thi = rt.InferenceSession("ONNX/thi.onnx")
 input_name_res = res.get_inputs()[0].name
@@ -18,12 +18,14 @@ input_name_thi = thi.get_inputs()[0].name
 label_name_thi = thi.get_outputs()[0].name
 
 
+# connect to the sqlite database
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
 
+# registration api
 @app.route('/register', methods=['POST'])
 def register():
     student_id = request.json.get('student_id')
@@ -40,8 +42,7 @@ def register():
         return make_response(jsonify(message), 200)
 
         
-
-
+# login api
 @app.route('/login', methods=['POST'])
 def login():
     student_id = request.json.get('student_id')
@@ -57,6 +58,7 @@ def login():
         abort(400)
 
 
+# activity prediction api
 @app.route('/predict', methods=['POST'])
 def predict():
     print("receive request")
@@ -75,7 +77,7 @@ def predict():
 
 # HOW TO USE TIMESTAMP TO FIND THE HISTORY
 # 1. Activity Per Hour, 1 miniute slice
-# 2. Activity Per Day, 10 miniutes slice
+# 2. Activity for five minutes, 5 seconds slice
 @app.route('/history', methods=['POST'])
 def history():
     student_id = request.json.get('student_id')
@@ -110,7 +112,7 @@ def history():
 
     # total recorded activity
     total = len(return_list) - return_list.count("")
-    unique_activity = list(filter(None, return_list))
+    unique_activity = list(set(filter(None, return_list)))
     activity_percentage_dic = helper_functions.generateActivityPercentageDic()
 
     for i in unique_activity:
@@ -136,6 +138,7 @@ def history():
             
 
 
+# main function to predict the activity
 def predict():
     result = None
     resDf = pd.read_csv("cache/res.csv")
@@ -210,13 +213,9 @@ def predict():
         result = thi_class_labels[pred_onx[0]]
     else:
         result = res_class_labels[pred_onx[0]]
-    # print(result)
     return result
 
         
-
-
-
 if __name__ == '__main__':
+    # TODO: change the host address to your internal IP address of the VM.
     app.run(host="10.154.0.2", debug=True)
-    #app.run(debug=True)
