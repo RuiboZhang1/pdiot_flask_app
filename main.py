@@ -210,7 +210,7 @@ def predict():
         thiFeatures = np.array([thiFeatures])
         thiFeatures = thiFeatures.astype(np.float32)
         pred_onx = thi.run([label_name_thi], {input_name_thi: thiFeatures})[0]
-        result = thi_class_labels[pred_onx[0]]
+        result = thi_class_labels[pred_onx[0] % 7]
     else:
         result = res_class_labels[pred_onx[0]]
     return result
